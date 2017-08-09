@@ -51,6 +51,7 @@ then
 	if [ $(echo $downloadLoc | egrep $currVer.$os) ]
 	then
 		echo [\!] Already have newest version
+		exit
 	else
 		echo [\!] Newer version available
 		echo [X] Upgrade not yet implemented
