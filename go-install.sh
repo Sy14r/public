@@ -24,44 +24,52 @@ fi
 url='https://golang.org/dl/'
 
 # Determine which utility will provide web access
-webMethod=$(which curl)
-if [ $? -eq 1 ]
+webMethod=''
+webFlags=''
+if [ $(which curl) ]
+then
+	webMethod=$(which curl)
+	webFlags='-s'
+elif [ $(which wget) ]
 then
 	webMethod=$(which wget)
+	webFlags='-qO-'
+else
+	echo "[X] No supported web methods found (curl, wget)"
+	exit
 fi
 
 # Download the newest (stable) version of go - and check if we already have go
 # if so abort for now, in future provide upgrade functionality
+echo [+] Finding newest version of Go
+downloadLoc=$($webMethod $webFlags $url | egrep -i "href.*$os.*$arch" | egrep -v "rc" | head -1 | cut -d'=' -f3 | tr -d '>' | tr -d '"')
+
+# Check if this is a fresh install or potential upgrade
+if [ $(which go) ]
+then
+	currVer=$(go version | cut -d' ' -f3)
+	if [ $(echo $downloadLoc | egrep $currVer.$os) ]
+	then
+		echo [\!] Already have newest version
+	else
+		echo [\!] Newer version available
+		echo [X] Upgrade not yet implemented
+		exit
+	fi
+fi
+
+# first download the installer
+echo [+] Downloading Go
+
 if [ $(echo $webMethod | grep 'curl') ]
 then
-	echo [+] Finding newest version of Go
-	downloadLoc=$($webMethod -s $url | egrep -i "href.*$os.*$arch" | egrep -v "rc" | head -1 | cut -d'=' -f3 | tr -d '>' | tr -d '"')
-
-	# Check if this is a fresh install or potential upgrade
-	if [ $(which go) ]
-	then
-		currVer=$(go version | cut -d' ' -f3)
-		if [ $(echo $downloadLoc | egrep $currVer.$os) ]
-		then
-			echo [\!] Already have newest version
-		else
-			echo [\!] Newer version available
-			echo [X] Upgrade not yet implemented
-			exit
-		fi
-	fi
-
-	# first download the installer
-	echo [+] Downloading Go
-	$webMethod -s $downloadLoc -o golang.tar.gz
-elif [ $(echo $webMethod | grep 'wget') ]
-then
-	echo [X] WGET not yet implemented
-	exit
+	webFlags='-so'
 else
-	echo [X] No support web methods found... exiting
-	exit
+	webFlags='-qO'
 fi
+
+$webMethod $webFlags golang.tar.gz $downloadLoc
+exit
 
 # Install Go
 echo [+] Installing Go
