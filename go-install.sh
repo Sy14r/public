@@ -69,7 +69,6 @@ else
 fi
 
 $webMethod $webFlags golang.tar.gz $downloadLoc
-exit
 
 # Install Go
 echo [+] Installing Go
