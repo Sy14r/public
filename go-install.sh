@@ -72,7 +72,12 @@ $webMethod $webFlags golang.tar.gz $downloadLoc
 
 # Install Go
 echo [+] Installing Go
-tar -C /usr/local -xzf golang.tar.gz
+sSudo='sudo'
+if [ "$(whoami)" == "root" ]
+then
+	sSudo=''
+fi
+$sSudo tar -C /usr/local -xzf golang.tar.gz
 rm golang.tar.gz
 
 # Modify the PATH env variable if necessary
