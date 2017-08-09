@@ -76,7 +76,7 @@ tar -C /usr/local -xzf golang.tar.gz
 rm golang.tar.gz
 
 # Modify the PATH env variable if necessary
-if [ "$(grep '/usr/local/go/bin' $HOME/.bash_profile)" == "" ]
+if [ "$(grep '/usr/local/go/bin' $HOME/.bash_profile 2>/dev/null)" == "" ]
 then
 	# and add the export for new PATH (if needed)
 	echo export PATH=\$PATH:/usr/local/go/bin >> $HOME/.bash_profile
