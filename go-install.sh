@@ -1,7 +1,7 @@
 #!/bin/bash
 # webMethod 	- binary to use for downloading
-# os 		- linux/bsd/osx...(only linux support at the moment) 
-# arch		- 32/64 bit distinction for now
+# os 			- linux/bsd/osx...(only linux support at the moment) 
+# arch			- 32/64 bit distinction for now
 
 # First verify that we are on a supported OS
 if [ $(uname -o | grep -i 'linux') ]
@@ -81,12 +81,28 @@ fi
 $sSudo tar -C /usr/local -xzf golang.tar.gz
 rm golang.tar.gz
 
-# Modify the PATH env variable if necessary
-if [ "$(grep '/usr/local/go/bin' $HOME/.bash_profile 2>/dev/null)" == "" ]
+
+# Get the User's current Shell
+# If the user is using zsh
+if [ "$(grep 'zsh' $SHELL 2>/dev/null)" != "" ]
 then
-	# and add the export for new PATH (if needed)
-	echo export PATH=\$PATH:/usr/local/go/bin >> $HOME/.bash_profile
-	. $HOME/.bash_profile
+	if [ "$(grep '/usr/local/go/bin' $HOME/.zshrc 2>/dev/null)" == "" ]
+	then
+		echo >> $HOME/.zshrc
+		echo export PATH=\$PATH:/usr/local/go/bin >> $HOME/.zshrc
+		. $HOME/.zshrc
+  	fi 
+fi
+
+#If the user is using bash
+if [ "$(grep 'bash' $SHELL 2>/dev/null)" != "" ]
+then
+	if [ "$(grep '/usr/local/go/bin' $HOME/.bash_profile 2>/dev/null)" == "" ]
+	then
+		# and add the export for new PATH (if needed)
+		echo export PATH=\$PATH:/usr/local/go/bin >> $HOME/.bash_profile
+		. $HOME/.bash_profile
+	fi
 fi
 
 echo [+] Installation Complete
